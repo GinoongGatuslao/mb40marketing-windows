@@ -9,8 +9,6 @@ using System.Linq;
 using System.Windows.Forms;
 using WindowsFormsApp1;
 using Microsoft.Office.Interop.Excel;
-using MySql.Data.MySqlClient;
-using MySql.Data;
 using GroupBox = System.Windows.Forms.GroupBox;
 using TextBox = System.Windows.Forms.TextBox;
 using Label = System.Windows.Forms.Label;
@@ -35,6 +33,7 @@ namespace WindowsFormsApp1
         private List<Loan> loans;
         private List<Profile> profiles;
         private List<Item> items;
+        private List<Transaction> transactions;
         private static Random random = new Random();
         private bool edit = false;
         private int selected_loanid = 0;
@@ -43,7 +42,7 @@ namespace WindowsFormsApp1
         private int current_userId = 0;
         private int selected_itemId = 0;
         private int selected_priceId = 0;
-        MySqlConnection con = SqlConnection.GetMysqlConnection();
+
         public MainForm()
         {
             InitializeComponent();
@@ -113,15 +112,6 @@ namespace WindowsFormsApp1
             //    Console.WriteLine(ex.Message.ToString());
             //}
             //Cursor.Current = Cursors.Default;
-            mo_inc_cb.Items.Add("P1000.00 or Less");
-            mo_inc_cb.Items.Add("P1001.00 - P3000.00");
-            mo_inc_cb.Items.Add("P3001.00 - P6000.00");
-            mo_inc_cb.Items.Add("P6001.00 - P10000.00");
-            mo_inc_cb.Items.Add("P10001.00 - P15000.00");
-            mo_inc_cb.Items.Add("P15001.00 - P25000.00");
-            mo_inc_cb.Items.Add("P25001.00 and up");
-            mo_inc_cb.SelectedIndex = 0;
-
             loan_status_cb.Items.Add("Inactive");
             loan_status_cb.Items.Add("Active");
             loan_status_cb.Items.Add("Completed");
@@ -136,7 +126,23 @@ namespace WindowsFormsApp1
             stype_tb.Items.Add("Collector");
             stype_tb.SelectedIndex = 0;
 
-           
+            mo_inc_cb.Items.Add("P1000.00 or Less");
+            mo_inc_cb.Items.Add("P1001.00 - P3000.00");
+            mo_inc_cb.Items.Add("P3001.00 - P6000.00");
+            mo_inc_cb.Items.Add("P6001.00 - P10000.00");
+            mo_inc_cb.Items.Add("P10001.00 - P15000.00");
+            mo_inc_cb.Items.Add("P15001.00 - P25000.00");
+            mo_inc_cb.Items.Add("P25001.00 and up");
+            mo_inc_cb.SelectedIndex = 0;
+
+            mo_exp_cb.Items.Add("P1000.00 or Less");
+            mo_exp_cb.Items.Add("P1001.00 - P3000.00");
+            mo_exp_cb.Items.Add("P3001.00 - P6000.00");
+            mo_exp_cb.Items.Add("P6001.00 - P10000.00");
+            mo_exp_cb.Items.Add("P10001.00 - P15000.00");
+            mo_exp_cb.Items.Add("P15001.00 - P25000.00");
+            mo_exp_cb.Items.Add("P25001.00 and up");
+            mo_exp_cb.SelectedIndex = 0;
         }
 
         /**
@@ -311,43 +317,42 @@ namespace WindowsFormsApp1
 
         private void viewLoanToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //Cursor.Current = Cursors.WaitCursor;
-            //try
-            //{
-            //    rightPanel[5].BringToFront();
-            //    leftPanel[1].BringToFront();
-            //    loansfilter_gb.Enabled = true;
-            //    search_gb.Enabled = true;
+            Cursor.Current = Cursors.WaitCursor;
+            try
+            {
+                rightPanel[5].BringToFront();
+                leftPanel[1].BringToFront();
+                loansfilter_gb.Enabled = true;
+                search_gb.Enabled = true;
 
-            //    restClient.endPoint = Settings.baseUrl
-            //        + "/api/loan/getloans";
+                restClient.endPoint = Settings.baseUrl
+                    + "/api/loan/getloans";
 
-            //    string response = string.Empty;
-            //    response = restClient.GetRequest();
-            //    Console.WriteLine("response : " + response);
+                string response = string.Empty;
+                response = restClient.GetRequest();
+                Console.WriteLine("response : " + response);
 
-            //    loans = JsonConvert.DeserializeObject<List<Loan>>(response);
-            //    loan_data.DataSource = null;
+                loans = JsonConvert.DeserializeObject<List<Loan>>(response);
+                loan_data.DataSource = null;
 
-            //    if (loans.Count != 0)
-            //    {
-            //        loan_data.DataSource = loans;
-            //        loan_data.Visible = true;
-            //        no_data_lbl.Visible = false;
-            //        format_loanDataTable();
-            //    }
-            //    else
-            //    {
-            //        no_data_lbl.Text = "No data.";
-            //        no_data_lbl.Visible = true;
-            //        loan_data.Visible = false;
-            //    }
-            //} catch (Exception ex)
-            //{
-            //    Console.WriteLine(ex.Message.ToString());
-            //}
-            //Cursor.Current = Cursors.Default;
-
+                if (loans.Count != 0)
+                {
+                    loan_data.DataSource = loans;
+                    loan_data.Visible = true;
+                    no_data_lbl.Visible = false;
+                    format_loanDataTable();
+                }
+                else
+                {
+                    no_data_lbl.Text = "No data.";
+                    no_data_lbl.Visible = true;
+                    loan_data.Visible = false;
+                }
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message.ToString());
+            }
+            Cursor.Current = Cursors.Default;
         }
 
         private void logoutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -461,31 +466,16 @@ namespace WindowsFormsApp1
                     item_data.DataSource = items;
                     item_data.Visible = true;
                     format_ItemDataTable();
-                }
-                else
+                } else
                 {
                     no_item_lbl.Visible = true;
                     item_data.Visible = false;
                 }
 
-            }
-            catch (Exception ex)
+            } catch (Exception ex)
             {
                 Console.WriteLine(ex.Message.ToString());
             }
-            //try
-            //{
-            //    con.Open();
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(this,ex.Message,"Error",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
-
-            //}
-            //finally
-            //{
-            //    con.Close();
-            //}
             Cursor.Current = Cursors.Default;
         }
 
@@ -538,7 +528,7 @@ namespace WindowsFormsApp1
                 response = restClient.GetRequest();
                 Console.WriteLine(response);
 
-                var transactions = JsonConvert.DeserializeObject<List<Transaction>>(response);
+                transactions = JsonConvert.DeserializeObject<List<Transaction>>(response);
                 trans_data.DataSource = null;
 
                 if (transactions.Count != 0)
@@ -1042,115 +1032,106 @@ namespace WindowsFormsApp1
             {
                 if (checkEmptyTextBoxes(confirmclient_panel.Controls))
                 {
-                    if (bday_picker.Value.Year<=DateTime.Now.Year-18 && bday_picker.Value.Year>=DateTime.Now.Year-70)
+                    if (cn_tb.Text.All(Char.IsDigit) && cn_tb.Text.Length == 10)
                     {
-                        if (cn_tb.Text.All(Char.IsDigit) && cn_tb.Text.Length == 10)
+                        Cursor.Current = Cursors.WaitCursor;
+                        string response = string.Empty;
+                        string jsonStr = string.Empty;
+                        Profile profile = new Profile();
+
+                        if (!edit)
                         {
-                            Cursor.Current = Cursors.WaitCursor;
-                            string response = string.Empty;
-                            string jsonStr = string.Empty;
-                            Profile profile = new Profile();
+                            restClient.endPoint = Settings.baseUrl
+                            + "/api/register";
+                            restClient.login = true;
 
-                            if (!edit)
-                            {
-                                restClient.endPoint = Settings.baseUrl
-                                + "/api/register";
-                                restClient.login = true;
+                            Register register = new Register();
+                            register.username = generatePassword(); //dummy
+                            register.user_type = "3"; //client
+                            register.password = "test123"; //not needed since client don't need login credentials
+                                                           //but fields cannot be empty so we put dummy password
+                            register.password_confirmation = "test123";
 
-                                Register register = new Register();
-                                register.username = generatePassword(); //dummy
-                                register.user_type = "3"; //client
-                                register.password = "test123"; //not needed since client don't need login credentials
-                                                               //but fields cannot be empty so we put dummy password
-                                register.password_confirmation = "test123";
+                            jsonStr = JsonConvert.SerializeObject(register);
+                            restClient.postJSON = jsonStr;
+                             response = restClient.PostRequest();
+                            Console.WriteLine(response);
 
-                                jsonStr = JsonConvert.SerializeObject(register);
-                                restClient.postJSON = jsonStr;
-                                response = restClient.PostRequest();
-                                Console.WriteLine(response);
+                            restClient.endPoint = Settings.baseUrl
+                            + "/api/profile/createprofile";
+                            restClient.login = false;
 
-                                restClient.endPoint = Settings.baseUrl
-                                + "/api/profile/createprofile";
-                                restClient.login = false;
+                            string[] res = response.Split('|');
+                            var jo = JObject.Parse(res[1]);
+                            var id = jo["id"].ToString();
 
-                                string[] res = response.Split('|');
-                                var jo = JObject.Parse(res[1]);
-                                var id = jo["id"].ToString();
+                            profile.user_id = Convert.ToInt32(id.ToString());
+                            profile.first_name = fn_tb.Text.ToString();
+                            profile.middle_name = mn_tb.Text.ToString();
+                            profile.last_name = ln_tb.Text.ToString();
+                            profile.gender = male_rb.Checked ? "male" : "female";
+                            profile.address = addr_tb.Text.ToString();
+                            profile.contact_num = cn_tb.Text.ToString();
+                            profile.bday = bday_picker.Value.ToString("MM/dd/yyyy");
+                            profile.occupation = occu_tb.Text.ToString();
+                            profile.mo_income = mo_inc_cb.SelectedItem.ToString();
+                            profile.mo_expense = mo_exp_cb.SelectedItem.ToString();
+                            profile.credit_limit = Convert.ToDouble(credit_limit_tb.Text.ToString());
+                            profile.verified = stat_cb.SelectedIndex;
+                            //todo profile.path_id_pic = ;
+                            //todo profile.path_house_sketch_pic = ;
 
-                                profile.user_id = Convert.ToInt32(id.ToString());
-                                profile.first_name = fn_tb.Text.ToString();
-                                profile.middle_name = mn_tb.Text.ToString();
-                                profile.last_name = ln_tb.Text.ToString();
-                                profile.gender = male_rb.Checked ? "male" : "female";
-                                profile.address = addr_tb.Text.ToString();
-                                profile.contact_num = cn_tb.Text.ToString();
-                                profile.bday = bday_picker.Value.ToString("MM/dd/yyyy");
-                                profile.occupation = occu_tb.Text.ToString();
-                                profile.mo_income = mo_inc_cb.SelectedItem.ToString();
-                                profile.mo_expense = "P1001.00 - P3000.00";
-                                profile.credit_limit = Convert.ToDouble(credit_limit_tb.Text.ToString());
-                                profile.verified = stat_cb.SelectedIndex;
-                                //todo profile.path_id_pic = ;
-                                //todo profile.path_house_sketch_pic = ;
+                            jsonStr = JsonConvert.SerializeObject(profile);
+                            Console.WriteLine(jsonStr);
+                            restClient.postJSON = jsonStr;
 
-                                jsonStr = JsonConvert.SerializeObject(profile);
-                                Console.WriteLine(jsonStr);
-                                restClient.postJSON = jsonStr;
-
-                                response = restClient.PostRequest();
-                                Console.WriteLine(response);
-                                MessageBox.Show("Account created successfully.", "Save Account",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Information);
-                            }
-                            else //edit
-                            {
-                                profile.user_id = selected_userId;
-                                profile.first_name = fn_tb.Text.ToString();
-                                profile.middle_name = mn_tb.Text.ToString();
-                                profile.last_name = ln_tb.Text.ToString();
-                                profile.gender = male_rb.Checked ? "male" : "female";
-                                profile.address = addr_tb.Text.ToString();
-                                profile.contact_num = cn_tb.Text.ToString();
-                                profile.bday = bday_picker.Value.ToString("MM/dd/yyyy");
-                                profile.occupation = occu_tb.Text.ToString();
-                                profile.mo_income = mo_inc_cb.SelectedItem.ToString();
-                                profile.mo_expense = "P1001.00 - P3000.00";//default na lng kay wala na time
-                                profile.credit_limit = Convert.ToDouble(credit_limit_tb.Text.ToString());
-                                profile.verified = 1; //verified
-                                                      //todo profile.path_id_pic = ;
-                                                      //todo profile.path_house_sketch_pic = ;
-
-                                restClient.endPoint = Settings.baseUrl
-                                    + "/api/profile/updateprofile/"
-                                    + selected_profileid;
-                                restClient.login = false;
-                                edit = false;
-                                jsonStr = JsonConvert.SerializeObject(profile);
-                                restClient.postJSON = jsonStr;
-
-                                response = restClient.PutRequest();
-                                Console.WriteLine(response);
-                                MessageBox.Show("Account created successfully.", "Save Account",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Information);
-                            }
-                            clearTextBoxes(confirmclient_panel.Controls);
-                            genpass_tb.Text = generatePassword();
-                            Cursor.Current = Cursors.Default;
-                        }
-                        else
-                        {
-                            MessageBox.Show("Invalid contact number.", "Save Account",
+                            response = restClient.PostRequest();
+                            Console.WriteLine(response);
+                            MessageBox.Show("Account created successfully.", "Save Account",
                                 MessageBoxButtons.OK,
-                                MessageBoxIcon.Error);
+                                MessageBoxIcon.Information);
                         }
+                        else //edit
+                        {
+                            profile.user_id = selected_userId;
+                            profile.first_name = fn_tb.Text.ToString();
+                            profile.middle_name = mn_tb.Text.ToString();
+                            profile.last_name = ln_tb.Text.ToString();
+                            profile.gender = male_rb.Checked ? "male" : "female";
+                            profile.address = addr_tb.Text.ToString();
+                            profile.contact_num = cn_tb.Text.ToString();
+                            profile.bday = bday_picker.Value.ToString("MM/dd/yyyy");
+                            profile.occupation = occu_tb.Text.ToString();
+                            profile.mo_income = mo_inc_cb.SelectedItem.ToString();
+                            profile.mo_expense = mo_exp_cb.SelectedItem.ToString();
+                            profile.credit_limit = Convert.ToDouble(credit_limit_tb.Text.ToString());
+                            profile.verified = 1; //verified
+                                                  //todo profile.path_id_pic = ;
+                                                  //todo profile.path_house_sketch_pic = ;
+
+                            restClient.endPoint = Settings.baseUrl
+                                + "/api/profile/updateprofile/"
+                                + selected_profileid;
+                            restClient.login = false;
+                            edit = false;
+                            jsonStr = JsonConvert.SerializeObject(profile);
+                            restClient.postJSON = jsonStr;
+
+                            response = restClient.PutRequest();
+                            Console.WriteLine(response);
+                            MessageBox.Show("Account created successfully.", "Save Account",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+                        }
+                        clearTextBoxes(confirmclient_panel.Controls);
+                        genpass_tb.Text = generatePassword();
+                        Cursor.Current = Cursors.Default;
                     }
                     else
                     {
-                        MessageBox.Show("Client should be between ages 18 and 70 yrs old", "Save Account",
-                       MessageBoxButtons.OK,
-                       MessageBoxIcon.Error);
+                        MessageBox.Show("Invalid contact number.", "Save Account",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
                     }
                 }
                 else
@@ -1519,12 +1500,75 @@ namespace WindowsFormsApp1
 
         private void scname_btn_Click(object sender, EventArgs e)
         {
+            trans_data.DataSource = null;
+            if (transactions.Count != 0)
+            {
+                List<Transaction> new_trans = new List<Transaction>();
+                foreach (Transaction i in transactions)
+                {
+                    if (!scname_tb.Text.ToString().Equals(string.Empty))
+                    {
+                        if (i.last_name.ToString().Equals(scname_tb.Text.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            new_trans.Add(i);
+                        }
+                    } else
+                    {
+                        new_trans.Add(i);
+                    }
+                    
+                }
 
+                if (new_trans.Count != 0)
+                {
+                    trans_data.DataSource = new_trans;
+                    trans_data.Visible = true;
+                    no_trans.Visible = false;
+                    format_transDataTable();
+                }
+                else
+                {
+                    trans_data.Visible = false;
+                    no_trans.Visible = true;
+                }
+            }
         }
 
         private void sclient_btn_Click(object sender, EventArgs e)
         {
-           
+            trans_data.DataSource = null;
+            if (transactions.Count != 0)
+            {
+                List<Transaction> new_trans = new List<Transaction>();
+                foreach (Transaction i in transactions)
+                {
+                    if (!sclient_tb.Text.ToString().Equals(string.Empty))
+                    {
+                        if (i.c_lname.ToString().Equals(sclient_tb.Text.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            new_trans.Add(i);
+                        }
+                    }
+                    else
+                    {
+                        new_trans.Add(i);
+                    }
+
+                }
+
+                if (new_trans.Count != 0)
+                {
+                    trans_data.DataSource = new_trans;
+                    trans_data.Visible = true;
+                    no_trans.Visible = false;
+                    format_transDataTable();
+                }
+                else
+                {
+                    trans_data.Visible = false;
+                    no_trans.Visible = true;
+                }
+            }
         }
 
         private void asearch_btn_Click(object sender, EventArgs e)
@@ -1773,6 +1817,83 @@ namespace WindowsFormsApp1
             Cursor.Current = Cursors.Default;
         }
 
+        private void daily_btn_Click(object sender, EventArgs e)
+        {
+            SummaryPrompt prompt = new SummaryPrompt();
+            prompt.tag = "DAILY";
+            prompt.Show();
+        }
+
+        private void weekly_btn_Click(object sender, EventArgs e)
+        {
+            SummaryPrompt prompt = new SummaryPrompt();
+            prompt.tag = "WEEKLY";
+            prompt.Show();
+        }
+
+        private void monthly_btn_Click(object sender, EventArgs e)
+        {
+            SummaryPrompt prompt = new SummaryPrompt();
+            prompt.tag = "MONTHLY";
+            prompt.Show();
+        }
+
+        private void payment_btn_Click(object sender, EventArgs e)
+        {
+            SummaryPrompt prompt = new SummaryPrompt();
+            prompt.tag = "CUSTOMER";
+            prompt.Show();
+        }
+
+        private void sales_btn_Click(object sender, EventArgs e)
+        {
+            //all completed loans
+            Cursor.Current = Cursors.WaitCursor;
+            try
+            {
+                restClient.endPoint = Settings.baseUrl
+                    + "/api/loan/getloans";
+
+                string response = string.Empty;
+                response = restClient.GetRequest();
+                Console.WriteLine("response : " + response);
+
+                var loans = JsonConvert.DeserializeObject<List<LoanReport>>(response);
+                loan_data.DataSource = null;
+
+                if (loans.Count != 0)
+                {
+                    loan_data.DataSource = transactions;
+                    List<LoanReport> rep = new List<LoanReport>();
+                    foreach (LoanReport p in loans)
+                    {
+                        if (p.status_str.ToString().Equals("Completed"))
+                        {
+                            rep.Add(p);
+                        }
+                    }
+                    if (rep.Count != 0)
+                    {
+                        loan_data.DataSource = rep;
+                        ImportDataGridViewDataToExcelSheet(loan_data, "Summary of Sales", LoanReport.headers);
+                        this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("No data.", "Report",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message.ToString());
+            }
+            Cursor.Current = Cursors.Default;
+        }
+
         /**
          * DOUBLE CLICK EVENTS
          **/
@@ -1795,7 +1916,7 @@ namespace WindowsFormsApp1
                     bday_picker.Text = accounts_data.Rows[e.RowIndex].Cells["bday"].Value.ToString();
                     occu_tb.Text = accounts_data.Rows[e.RowIndex].Cells["occupation"].Value.ToString();
                     mo_inc_cb.SelectedIndex = mo_inc_cb.Items.IndexOf(accounts_data.Rows[e.RowIndex].Cells["mo_income"].Value.ToString());
-                    //mo_exp_cb.SelectedIndex = mo_exp_cb.Items.IndexOf(accounts_data.Rows[e.RowIndex].Cells["mo_expense"].Value.ToString());
+                    mo_exp_cb.SelectedIndex = mo_exp_cb.Items.IndexOf(accounts_data.Rows[e.RowIndex].Cells["mo_expense"].Value.ToString());
                     credit_limit_tb.Text = Convert.ToDouble(accounts_data.Rows[e.RowIndex].Cells["credit_limit"].Value).ToString("N1");
                     stat_cb.SelectedIndex = Convert.ToInt32(accounts_data.Rows[e.RowIndex].Cells["verified"].Value.ToString());
                     if (accounts_data.Rows[e.RowIndex].Cells["gender"].Value.ToString().Equals("Male"))
@@ -2361,7 +2482,7 @@ namespace WindowsFormsApp1
          **/
         private void mo_inc_cb_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch (mo_inc_cb.SelectedIndex)
+            switch(mo_inc_cb.SelectedIndex)
             {
                 case 0:
                     credit_limit_tb.Text = "50.00";
@@ -2482,13 +2603,28 @@ namespace WindowsFormsApp1
 
         private void format_transDataTable()
         {
-            /**trans_data.Columns[0].HeaderText = "ID";
-            trans_data.Columns[].HeaderText = "";
-            trans_data.Columns[].HeaderText = "";
-            trans_data.Columns[].HeaderText = "";
-            trans_data.Columns[].HeaderText = "";
-            trans_data.Columns[].HeaderText = "";
-            trans_data.Columns[].HeaderText = "";**/
+            trans_data.Columns[0].HeaderText = "ID";
+            trans_data.Columns[2].HeaderText = "Loan ID";
+            trans_data.Columns[4].HeaderText = "Payment";
+            trans_data.Columns[5].HeaderText = "Balance";
+            trans_data.Columns[10].HeaderText = "Client";
+            trans_data.Columns[13].HeaderText = "Collected By";
+
+            trans_data.Columns[1].Visible = false;
+            trans_data.Columns[3].Visible = false;
+            trans_data.Columns[6].Visible = false;
+            trans_data.Columns[7].Visible = false;
+            trans_data.Columns[8].Visible = false;
+            trans_data.Columns[9].Visible = false;
+            trans_data.Columns[11].Visible = false;
+            trans_data.Columns[12].Visible = false;
+
+            trans_data.Columns[4].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            trans_data.Columns[5].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            trans_data.Columns[4].DefaultCellStyle.Format = "N1";
+            trans_data.Columns[5].DefaultCellStyle.Format = "N1";
+            trans_data.Columns[0].Width = 85;
+            trans_data.Columns[2].Width = 85;
         }
 
         public void ClearTextBoxesInAddLoan(Control.ControlCollection ctrlCollection)
@@ -2739,148 +2875,5 @@ namespace WindowsFormsApp1
             releaseObject(xlWorkBook);
             releaseObject(xlApp);
         }
-
-        private void dashboard_panel_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        /*
-         * Leave Events
-         *          
-         */
-        private void fn_tb_Leave(object sender, EventArgs e)
-        {
-            if (fn_tb.Text.Any(Char.IsDigit))
-            {
-                MessageBox.Show(this, "First Name Cannot Contain Digits", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //fn_tb.Focus();
-                fn_tb.Text = "";
-            }
-            else if (fn_tb.Text.All(Char.IsWhiteSpace))
-            {
-                MessageBox.Show(this, "First Name Cannot Be Empty", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //fn_tb.Focus();
-                fn_tb.Text = "";
-            }
-            else
-            {
-                fn_tb.Text = fn_tb.Text.ToString().Trim();
-            }
-        }
-
-        private void mn_tb_Leave(object sender, EventArgs e)
-        {
-            if (mn_tb.Text.Any(Char.IsDigit))
-            {
-                MessageBox.Show(this, "Middle Name Cannot Contain Digits", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //mn_tb.Focus();
-                mn_tb.Text = "";
-            }
-            else if (mn_tb.Text.All(Char.IsWhiteSpace))
-            {
-                MessageBox.Show(this, "Middle Name Cannot Be Empty", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //mn_tb.Focus();
-                mn_tb.Text = "";
-            }
-            else
-            {
-                mn_tb.Text = mn_tb.Text.ToString().Trim();
-            }
-        }
-
-        private void ln_tb_Leave(object sender, EventArgs e)
-        {
-            if (ln_tb.Text.Any(Char.IsDigit))
-            {
-                MessageBox.Show(this, "Last Name Cannot Contain Digits", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //ln_tb.Focus();
-                ln_tb.Text = "";
-            }
-            else if (ln_tb.Text.All(Char.IsWhiteSpace))
-            {
-                MessageBox.Show(this, "Last Name Cannot Be Empty", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //ln_tb.Focus();
-                ln_tb.Text = "";
-            }
-            else
-            {
-                ln_tb.Text = ln_tb.Text.ToString().Trim();
-                bday_picker.MaxDate=DateTime.Now;
-            }
-        }
-
-        //private void inc_tb_Leave(object sender, EventArgs e)
-        //{
-        //    if (!inc_tb.Text.ToString().Equals(string.Empty))
-        //    {
-        //        if (inc_tb.Text.All(Char.IsDigit))
-        //        {
-
-        //            if (Convert.ToInt32(inc_tb.Text.ToString()) >= 100 && Convert.ToInt32(inc_tb.Text.ToString()) <= 1000)
-        //            {
-        //                credit_limit_tb.Text = "50";
-        //                inc_tb.Text = Convert.ToDouble(inc_tb.Text).ToString("N1");
-        //            }
-        //            else if (Convert.ToInt32(inc_tb.Text.ToString()) > 1000 && Convert.ToInt32(inc_tb.Text.ToString()) <= 3000)
-        //            {
-        //                credit_limit_tb.Text = "150";
-        //                inc_tb.Text = Convert.ToDouble(inc_tb.Text).ToString("N1");
-        //            }
-        //            else if (Convert.ToInt32(inc_tb.Text.ToString()) > 3000 && Convert.ToInt32(inc_tb.Text.ToString()) <= 6000)
-        //            {
-        //                credit_limit_tb.Text = "250";
-        //                inc_tb.Text = Convert.ToDouble(inc_tb.Text).ToString("N1");
-        //            }
-        //            else if (Convert.ToInt32(inc_tb.Text.ToString()) > 6000 && Convert.ToInt32(inc_tb.Text.ToString()) <= 10000)
-        //            {
-        //                credit_limit_tb.Text = "400";
-        //                inc_tb.Text = Convert.ToDouble(inc_tb.Text).ToString("N1");
-        //            }
-        //            else if (Convert.ToInt32(inc_tb.Text.ToString()) > 10000 && Convert.ToInt32(inc_tb.Text.ToString()) <= 15000)
-        //            {
-        //                credit_limit_tb.Text = "500";
-        //                inc_tb.Text = Convert.ToDouble(inc_tb.Text).ToString("N1");
-        //            }
-        //            else if (Convert.ToInt32(inc_tb.Text.ToString()) > 15000 && Convert.ToInt32(inc_tb.Text.ToString()) <= 25000)
-        //            {
-        //                credit_limit_tb.Text = "600";
-        //                inc_tb.Text = Convert.ToDouble(inc_tb.Text).ToString("N1");
-        //            }
-        //            else if (Convert.ToInt32(inc_tb.Text.ToString()) > 25000)
-        //            {
-        //                credit_limit_tb.Text = "1000";
-        //                inc_tb.Text = Convert.ToDouble(inc_tb.Text).ToString("N1");
-        //            }
-        //            else
-        //            {
-        //                cred_lmt_tb.Focus();
-        //                cred_lmt_tb.Text = "";
-        //                MessageBox.Show("Must be greater than 99", "Number Input",
-        //              MessageBoxButtons.OK,
-        //              MessageBoxIcon.Error);
-
-        //            }
-                    
-        //        }
-        //        else
-        //        {
-        //            MessageBox.Show("Invalid number.", "Number Input",
-        //                MessageBoxButtons.OK,
-        //                MessageBoxIcon.Error);
-        //        }
-        //    }
-        //}
-        private void cn_tb_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void bday_picker_Enter(object sender, EventArgs e)
-        {
-            
-        }
-
-        
     }
 }
