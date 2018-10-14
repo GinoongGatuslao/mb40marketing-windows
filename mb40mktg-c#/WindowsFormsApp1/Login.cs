@@ -8,7 +8,7 @@ namespace WindowsFormsApp1
     public partial class Login : Form
     {
         public static string api_token = string.Empty;
-        public static int id = 4;
+        public static int id = 0;
         public static int user_type = 0;
 
         public Login()
@@ -64,16 +64,6 @@ namespace WindowsFormsApp1
                 MessageBox.Show("Username and password cannot be empty", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        private void app_name_lbl_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void Login_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }
